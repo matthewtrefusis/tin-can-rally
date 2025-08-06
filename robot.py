@@ -156,3 +156,104 @@ def drive_to_marker(target_id, target_distance):
 drive_to_marker(1, 500)  # Drive to marker 1 until 500mm away
 drive_to_marker(3, 500)  # Drive to marker 3 until 300mm away
 drive_to_marker(5, 500)  # Drive to marker 5 until 500mm away
+
+
+from sbot import motors,utils,arduino,AnalogPin,BRAKE,COAST,PowerOutputPosition,vision
+
+
+while True:
+    left_IR = arduino.analog_read(AnalogPin.A0)
+    centre_IR = arduino.analog_read(AnalogPin.A1)
+    right_IR = arduino.analog_read(AnalogPin.A2)
+
+    def set_motors(left, right):
+        motors.set_power(0, left)
+        motors.set_power(1, right)
+
+    
+    def savetoMove():
+        distance = arduino.measure_ultrasound_distance(2, 3)
+        if (distance <= 50) and (distance > 0):
+            
+            print("Ultrasound detected an obstacle")
+            print(f"Distance: {distance} mm")
+            current_state = "backward"
+            set_state(current_state)
+            utils.sleep(3)
+            current_state = "left"
+            set_state(current_state)
+            utils.sleep(1)
+            return False
+        else:
+            return True
+    def default(state):
+        if left_IR>1.2 and left_IR < 3.5:
+            return "forward"
+
+
+    def set_state(state):
+        if state == "forward":
+            set_motors(0.275,0.275)
+        elif state == "left":
+            set_motors(-0.2,0.2)
+        elif state == "right":
+            set_motors(0.2,-0.2)
+        elif state == "stop":
+            set_motors(0, 0)
+        elif state == "backward":
+            set_motors(-0.275, -0.275)
+        elif state == "crazy":
+            set_motors(1, 1)
+            
+
+    if (left_IR > 1.2 and left_IR < 3.5) and (right_IR > 1.2 and right_IR < 3.5):
+        current_state = "forward"
+        set_state(current_state)
+        if savetoMove() == True:
+            utils.sleep(0.5)
+        
+            
+
+    if left_IR < 1.2 and right_IR < 1.2:
+        current_state = "forward"
+    else:
+        if left_IR > 3.5 or left_IR < 1.2:
+            current_state = "left"
+        if left_IR > 1.2 and left_IR < 3.5:
+            current_state = "right"
+    set_state(current_state)
+
+
+
+
+        
+
+while False:
+    Kp = 0.1 # Proportional gain
+
+    def set_motors(left, right):
+        motors.set_power(0, left)
+        motors.set_power(1, right)
+
+    # Read IR sensor values
+    left_IR = arduino.analog_read(AnalogPin.A0)
+    centre_IR = arduino.analog_read(AnalogPin.A1)
+    right_IR = arduino.analog_read(AnalogPin.A2)
+
+    # Combine side error and center deviation to calculate the overall error
+    error = 3 - right_IR
+
+    # Calculate motor speeds using proportional control
+    base_speed = 0.2/max(0.001, abs(error))
+    correction = Kp * error
+
+    left_speed = base_speed - correction
+    right_speed = base_speed + correction
+    print(left_speed, right_speed)
+
+    # Ensure motor speeds are within valid range (0 to 1)
+    left_speed = max(-1, min(1, left_speed))
+    right_speed = max(-1, min(1, right_speed))
+
+    # Set motor speeds
+    set_motors(left_speed, right_speed)
