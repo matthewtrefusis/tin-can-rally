@@ -1,5 +1,6 @@
 from sbot import *
 
+
 # Helper to set both motors
 def set_motors(left, right):
     motors.set_power(0, left)
@@ -51,7 +52,20 @@ def proportionalControl(Kp, IR, baseValue,expectedValue ):
     # Set motor speeds
     set_motors(left_speed, right_speed)
 
-def set_state(state):
+
+current_state = "forward"
+while True:
+    # Read IR sensor values
+    left_IR = arduino.analog_read(AnalogPin.A0)
+    centre_IR = arduino.analog_read(AnalogPin.A1)
+    right_IR = arduino.analog_read(AnalogPin.A2)
+
+    print(left_IR, centre_IR, right_IR)
+
+    Kp = 0.4 # Proportional gain
+    BaseValue = 0.2
+    
+    def set_state(state):
         print(current_state)
         if state == "forward":
             set_motors(0.25,0.25)
@@ -93,15 +107,6 @@ def set_state(state):
             set_motors(-.05, 0.05)  # Rotate in place
             utils.sleep(0.015)
 
-current_state = "forward"   
-
-while True:
-    # Read IR sensor values
-    left_IR = arduino.analog_read(AnalogPin.A0)
-    centre_IR = arduino.analog_read(AnalogPin.A1)
-    right_IR = arduino.analog_read(AnalogPin.A2)
-    
-    print(left_IR, centre_IR, right_IR)
 
     if left_IR < 1.2 and current_state!= "left black":
         current_state = "left"
@@ -124,3 +129,24 @@ while True:
     if timer > 10:
         current_state = "vision"
     set_state(current_state)
+
+while False:
+    Kp = 0.1 # Proportional gain
+
+    # Combine side error and center deviation to calculate the overall error
+    error = 3 - right_IR
+
+    # Calculate motor speeds using proportional control
+    base_speed = 0.2/max(0.001, abs(error))
+    correction = Kp * error
+
+    left_speed = base_speed - correction
+    right_speed = base_speed + correction
+    print(left_speed, right_speed)
+
+    # Ensure motor speeds are within valid range (0 to 1)
+    left_speed = max(-1, min(1, left_speed))
+    right_speed = max(-1, min(1, right_speed))
+
+    # Set motor speeds
+    set_motors(left_speed, right_speed)
