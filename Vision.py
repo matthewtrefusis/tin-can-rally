@@ -19,17 +19,17 @@ def drive_to_marker(target_id, target_distance):
         rightDistance = arduino.measure_ultrasound_distance(13, 12)
         bumpcentral = arduino.digital_read(11)
         utils.sleep(0.1)  # Allow some time for the sensors to stabilize
-        if bumpcentral == 1:
+        if bumpcentral:
             print("Bump detected, reversing")
             set_motors(-0.2, -0.2)
             utils.sleep(1)
         if leftDistance < 50:
             print("Obstacle detected, reversing")
-            set_motors(-0.2, 0.2)
+            set_motors(0.2, -0.2)
             utils.sleep(1)
         if rightDistance < 50:
             print("Obstacle detected, reversing")
-            set_motors(0.2, -0.2)
+            set_motors(-0.2, 0.2)
             utils.sleep(1)
     
         
@@ -48,7 +48,7 @@ def drive_to_marker(target_id, target_distance):
                     utils.sleep(0.3)
                     set_motors(0,0)
                     utils.sleep(0.1)
-                    print("Heading towards marker {target_id}")
+                    print(f"Heading towards marker {target_marker.id} at distance {target_marker.position.distance}")
             else:  # Reached the target distance
                 set_motors(0, 0)
                 break
@@ -60,37 +60,37 @@ def drive_to_marker(target_id, target_distance):
 
 
 while True:
-    drive_to_marker(1, 1200)  # Drive to marker 1 until 700mm away
+    drive_to_marker(1, 800)  # Drive to marker 1 until 700mm away
     print("Going to marker 1")
     set_motors(-0.2, 0.2)  # Rotate in place
-    utils.sleep(0.75)
-    drive_to_marker(3, 1200)  # Drive to marker 3 until 700mm away
+    utils.sleep(0.5)
+    drive_to_marker(3, 800)  # Drive to marker 3 until 700mm away
     print("Going to marker 3")
     set_motors(0.2, -0.2)  # Rotate in place
-    utils.sleep(0.75)
-    drive_to_marker(5, 1200)  # Drive to marker 5 until 700mm away
+    utils.sleep(1)
+    drive_to_marker(5, 800)  # Drive to marker 5 until 700mm away
     print("Going to marker 5")
     set_motors(-0.2, 0.2)  # Rotate in place
-    utils.sleep(0.75)
-    drive_to_marker(7, 1200)  # Drive to marker 7 until 700mm away
+    utils.sleep(0.5)
+    drive_to_marker(7, 500)  # Drive to marker 7 until 700mm away
     set_motors(-0.2, 0.2)  # Rotate in place
-    utils.sleep(0.75)
-    drive_to_marker(1, 1200)  # Drive to marker 9 until 700mm away
+    utils.sleep(0.5)
+    drive_to_marker(1, 800)  # Drive to marker 1 until 700mm away
     set_motors(-0.2, 0.2)  # Rotate in place
-    utils.sleep(0.75)
-    drive_to_marker(3, 1200)  # Drive to marker 3 until 700mm away
+    utils.sleep(0.5)
+    drive_to_marker(3, 800)  # Drive to marker 3 until 700mm away
     set_motors(0.2, -0.2)  # Rotate in place
-    utils.sleep(0.75)
-    drive_to_marker(5, 1200)  # Drive to marker 5 until 700mm away
+    utils.sleep(0.5)
+    drive_to_marker(5, 800)  # Drive to marker 5 until 700mm away
     set_motors(-0.2, 0.2)  # Rotate in place
-    utils.sleep(0.75)
-    drive_to_marker(7, 1200)  # Drive to marker 7 until 700mm away
+    utils.sleep(0.5)
+    drive_to_marker(7, 800)  # Drive to marker 7 until 700mm away
     set_motors(-0.2, 0.2)  # Rotate in place
-    utils.sleep(0.75)
-    drive_to_marker(1, 1200)  # Drive to marker 9 until 700mm away
+    utils.sleep(0.5)
+    drive_to_marker(1, 800)  # Drive to marker 1 until 700mm away
     set_motors(-0.2, 0.2)  # Rotate in place
-    utils.sleep(0.75)
-    drive_to_marker(3, 1200)  # Drive to marker 3 until 700mm away
+    utils.sleep(0.5)
+    drive_to_marker(3, 800)  # Drive to marker 3 until 700mm away
     set_motors(0.2, -0.2)  # Rotate in place
-    utils.sleep(0.75)
+    utils.sleep(0.5)
 
