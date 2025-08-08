@@ -1,1 +1,102 @@
+from sbot import *
+
+# Helper to set both motors
+def set_motors(left, right):
+    motors.set_power(1, left)
+    motors.set_power(0, right)
+
+# Helper to find the target marker in the list of markers
+def find_target(markerlist, target):
+    for marker in markerlist:
+        if marker.id == target:
+            return marker
+    return None
+
+# Function to drive toward a marker until a specific distance
+def drive_to_marker(target_id, target_distance):
+    while True:
+        leftDistance = arduino.measure_ultrasound_distance(2, 3)
+        rightDistance = arduino.measure_ultrasound_distance(13, 12)
+        bumpcentral = arduino.digital_read(11)
+        utils.sleep(0.1)  # Allow some time for the sensors to stabilize
+        print(arduino.digital_read(11))
+        if bumpcentral == True:
+            print("Bump detected, reversing")
+            set_motors(-0.3, -0.3)
+            utils.sleep(0.5)
+        if leftDistance < 50:
+            print("Obstacle detected, reversing")
+            set_motors(0.2, -0.2)
+            utils.sleep(1)
+        if rightDistance < 50:
+            print("Obstacle detected, reversing")
+            set_motors(-0.2, 0.2)
+            utils.sleep(1)
+    
+        
+        markerlist = vision.detect_markers()
+        anymarkers = vision.detect_markers()
+        target_marker = find_target(markerlist, target_id)
+        if target_marker is not None:
+            distance_error = target_marker.position.distance - target_distance
+            angle_error = target_marker.position.horizontal_angle
+            if distance_error > 0:  # Still too far from the marker
+                if angle_error > 0.2:  # Target is on the right
+                    set_motors(0.1, -0.1)
+                elif angle_error < -0.2:  # Target is on the left
+                    set_motors(-0.1, 0.1)
+                else:  # Target is straight ahead
+                    set_motors(0.3, 0.3)
+                    utils.sleep(0.3)
+                    set_motors(0,0)
+                    utils.sleep(0.1)
+                    print(f"Heading towards marker {target_marker.id} at distance {target_marker.position.distance}")
+            
+            else:  # Reached the target distance
+                set_motors(0, 0)
+                break
+            #end = time.time()
+            #timeelapsed = end - start
+            #'if timeelapsed > 15 and target_marker.position.distance > 50:
+                #print("Timeout reached, stopping")
+                #set_motors(-0.3, -0.3)
+                #break
+        else:
+            set_motors(-0.3, 0.3)  # Rotate in place
+            utils.sleep(0.1)
+            set_motors(0, 0)
+            utils.sleep(0.2)
+
+
+while True:
+    drive_to_marker(1, 800)  # Drive to marker 1 until 700mm away
+    set_motors(-0.2, 0.2)  # Rotate in place
+    utils.sleep(0.5)
+    drive_to_marker(3, 800)  # Drive to marker 3 until 700mm away
+    set_motors(0.2, -0.2)  # Rotate in place
+    utils.sleep(1)
+    drive_to_marker(5, 800)  # Drive to marker 5 until 700mm away
+    set_motors(-0.2, 0.2)  # Rotate in place
+    utils.sleep(0.5)
+    drive_to_marker(7, 500)  # Drive to marker 7 until 700mm away
+    set_motors(-0.2, 0.2)  # Rotate in place
+    utils.sleep(0.5)
+    drive_to_marker(1, 800)  # Drive to marker 1 until 700mm away
+    set_motors(-0.2, 0.2)  # Rotate in place
+    utils.sleep(0.5)
+    drive_to_marker(3, 800)  # Drive to marker 3 until 700mm away
+    set_motors(0.2, -0.2)  # Rotate in place
+    utils.sleep(0.5)
+    drive_to_marker(5, 800)  # Drive to marker 5 until 700mm away
+    set_motors(-0.2, 0.2)  # Rotate in place
+    utils.sleep(0.5)
+    drive_to_marker(7, 800)  # Drive to marker 7 until 700mm away
+    set_motors(-0.2, 0.2)  # Rotate in place
+    utils.sleep(0.5)
+    drive_to_marker(1, 800)  # Drive to marker 1 until 700mm away
+    set_motors(-0.2, 0.2)  # Rotate in place
+    utils.sleep(0.5)
+    drive_to_marker(3, 800)  # Drive to marker 3 until 700mm away
+    set_motors(0.2, -0.2)  # Rotate in place
+    utils.sleep(0.5)
 
